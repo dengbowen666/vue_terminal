@@ -1,12 +1,12 @@
 
 
 html {
-
+background: #000;
+box-sizing: border-box;
 }
 
-body {
-   background: black;
-}
+
+
 
 .jsterm a {
    color: #E0E0E0;
@@ -22,13 +22,12 @@ div.jsterm {
    font-family: monospace;
    font-size: 16px;
    color: #E0E0E0;
-   width: 900px;
    margin-bottom: 20px;
-   white-space: pre-wrap;
+  margin-left: 2ex;
 }
 
 .host, .host a {
-   color: #5555ff;
+   color: #7070b6;
    font-weight: bold;
 }
 
@@ -48,7 +47,7 @@ div.jsterm .cwd, div.jsterm .cwd a {
 
 
 div.jsterm .dir, div.jsterm .dir a {
-   color: #5555ff;
+   color: #779bc3;
    font-weight: bold;
 }
 
@@ -67,6 +66,4 @@ div.jsterm .img, div.jsterm .img a {
    font-weight: bold;
 }
 
-#blinker {
-    line-height: .9em;
-}
+

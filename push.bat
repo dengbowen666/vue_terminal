@@ -1,12 +1,5 @@
-#!/bin/bash
-# 获取当前日期，格式为 YYYYMMDD
-current_date=$(date +%Y%m%d)
-	
-# 添加所有变更到暂存区
-git add .
-	
-# 提交变更，包括当前日期
-git commit -m "updated${current_date}_xk"
-	
-# 推送到远程仓库的 master 分支
+git status
+git add . 
+git commit -m "Push Files: %date:~0,10%, %time:~0,8%" 
 git push origin master
+pause>nul

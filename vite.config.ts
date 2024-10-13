@@ -10,7 +10,8 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src')
-    }
-  }
-})
+      "@": resolve(__dirname, "src"),
+    },
+  },
+  base: "/vue_terminal/", // 设置打包路径
+});

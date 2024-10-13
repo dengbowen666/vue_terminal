@@ -1,40 +1,51 @@
-# 该workflow的名称，可以随意填写
-name: Build And Deploy To Github Pages
+name: src
 
-# workflow的触发事件，这里代表main分支的push事件触发
 on:
+  # 每当 push 到 main 分支时触发部署
   push:
-    branches: [ master ]
+    branches: [master]
+  # 手动触发部署
+  workflow_dispatch:
 
-# 任务
 jobs:
-  # build-and-deploy 为任务的ID
-  build-and-deploy:
-    # 运行所需要的环境
-    runs-on: ubuntu-latest 
+  src:
+    runs-on: ubuntu-latest
 
     steps:
-      # 步骤名
-      - name: Checkout
-        # 使用的actions脚本，这里是官方提供的获取源码脚本
-        uses: actions/checkout@v2.3.1
-        # 这个为使用 JamesIves/github-pages-deploy-action脚本所需要的配置
+      - uses: actions/checkout@v4
         with:
-          persist-credentials: false
+          # “最近更新时间” 等 git 日志相关信息，需要拉取全部提交记录
+          fetch-depth: 0
 
-      # 执行npm脚本打包项目
-      - name: Install and Build
-        run: |
-          npm install
-          npm run build
-      
-      # 执行JamesIves/github-pages-deploy-action将项目发布到Github Pages
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
         with:
-          # 该workflow需要操作repo，因此需要一个密钥，下面会讲到如何获取这个密钥
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          # 发布到的分支
-          BRANCH: gh-pages
-          # 要发布的文件夹
-          FOLDER: dist
+          # 选择要使用的 pnpm 版本
+          version: 8
+          # 使用 pnpm 安装依赖
+          run_install: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          # 选择要使用的 node 版本
+          node-version: 20
+          # 缓存 pnpm 依赖
+          cache: pnpm
+
+      # 运行构建脚本
+      - name: Build VuePress site
+        run: pnpm docs:build
+
+      # 查看 workflow 的文档来获取更多信息
+      # @see https://github.com/crazy-max/ghaction-github-pages
+      - name: Deploy to GitHub Pages
+        uses: crazy-max/ghaction-github-pages@v4
+        with:
+          # 部署到 gh-pages 分支
+          target_branch: gh-pages
+          # 部署目录为 VuePress 的默认输出目录
+          build_dir: src/.vuepress/dist
+        env:
+          # @see https://docs.github.com/cn/actions/reference/authentication-in-a-workflow#about-the-github_token-secret
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}

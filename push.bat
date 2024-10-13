@@ -1,16 +1,12 @@
 #!/bin/bash
-
-# 获取当前时间
-current_time=$(date "+%Y-%m-%d %H:%M:%S")
-
-# 提交信息
-commit_message="Update at $current_time"
-
-# 添加所有更改到暂存区
+# 获取当前日期，格式为 YYYYMMDD
+current_date=$(date +%Y%m%d)
+	
+# 添加所有变更到暂存区
 git add .
-
-# 提交更改
-git commit -m "$commit_message"
-
-# 推送到远程仓库
+	
+# 提交变更，包括当前日期
+git commit -m "updated${current_date}_xk"
+	
+# 推送到远程仓库的 master 分支
 git push origin master

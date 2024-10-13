@@ -1,69 +1,40 @@
-# .github/workflows/auto-deploy.yml
+# 该workflow的名称，可以随意填写
+name: Build And Deploy To Github Pages
 
-name: auto deploy 🚀
-
+# workflow的触发事件，这里代表main分支的push事件触发
 on:
-  # 监听push操作
   push:
-    branches:
-      - master # 这里只配置了main分支，所以只有推送main分支才会触发以下任务
-  pull_request:
+    branches: [ master ]
 
-  # 这个选项可以使你手动在 Action tab 页面触发工作流
-  # workflow_dispatch:
-
-permissions:
-  # 允许对仓库的内容进行写操作。包括创建、修改和删除文件、目录以及提交更改等
-  # 这里只配置了push，所以只有推送main分支才会触发以下任务 
-  contents: write
-  # 允许管理 GitHub Pages 服务并对其进行写操作
-  pages: write
-
-
+# 任务
 jobs:
-  # 任务ID
+  # build-and-deploy 为任务的ID
   build-and-deploy:
-    # 运行环境
-    # runs-on: macos-latest
-    # runs-on: windows-latest
-    runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-    
-    # 步骤
+    # 运行所需要的环境
+    runs-on: ubuntu-latest 
+
     steps:
-      # 官方action，将代码拉取到虚拟机
+      # 步骤名
       - name: Checkout
-        uses: actions/checkout@v3
-
-      # 建一个名为setup-node的步骤（安装指定版本的Node.js）
-      - name: setup-node 
-        # 使用setup-node@v3这个action
-        uses: actions/setup-node@v3
-        # 指定某个action 可能需要输入的参数
+        # 使用的actions脚本，这里是官方提供的获取源码脚本
+        uses: actions/checkout@v2.3.1
+        # 这个为使用 JamesIves/github-pages-deploy-action脚本所需要的配置
         with:
-          node-version: '20.x'
+          persist-credentials: false
 
-      # 安装 pnpm
-      - name: Install pnpm
-        run: npm install pnpm -g
-
-      # 安装依赖  
-      - name: Install dependencies
-        run: pnpm i
-      # 打包
-      - name: Build application 🔧
-        run: pnpm run build
-
-      # 部署 https://github.com/JamesIves/github-pages-deploy-action
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
-        if: github.ref == 'refs/heads/main'
+      # 执行npm脚本打包项目
+      - name: Install and Build
+        run: |
+          npm install
+          npm run build
+      
+      # 执行JamesIves/github-pages-deploy-action将项目发布到Github Pages
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
-          token: ${{ secrets.ACCESS_TOKEN }}
-          branch: gh-pages  # default: gh-pages
-          folder: dist
-          clean: true # Automatically remove deleted files from the deploy branch
-          # commit-message: ${{ github.event.head_commit.message }} # default: `Deploying to gh-pages from @ 3238feb 🚀`
-          # commit-message: "deploy: ${{ github.sha }} (${{ github.event.head_commit.message }}) 🚀 "
-
+          # 该workflow需要操作repo，因此需要一个密钥，下面会讲到如何获取这个密钥
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          # 发布到的分支
+          BRANCH: gh-pages
+          # 要发布的文件夹
+          FOLDER: dist
